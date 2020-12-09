@@ -1,6 +1,21 @@
-# form-data
+# <center>🧾 `package:form_data`</center>
 
-Form data builder for Dart.
+[![Pub Version](https://img.shields.io/pub/v/form_data)](https://pub.dev/packages/form_data)
+[![RFC](https://img.shields.io/badge/RFC-7578-blue)](https://tools.ietf.org/html/rfc7578)
+
+`Content-Type: multipart/form-data` builder for Dart aiming to be compatible with [RFC 7578](https://tools.ietf.org/html/rfc7578).
+
+API documentation is available [here](https://pub.dev/documentation/form_data/latest/).
+
+
+## Installation
+
+Add `form_data` to your `pubspec.yaml` and run `pub get` or `flutter pub get`.
+
+```yaml
+dependencies:
+  form_data: ^0.0.1-nullsafety.0
+```
 
 ## Usage
 
