@@ -34,8 +34,7 @@ class FormData {
   /// Add a field [name] to the form data.
   ///
   /// [value] will be converted to a string using [Object.toString] and encoded using [FormData.encoding].
-  void add(String name, dynamic value,
-      {String? contentType, String? filename}) {
+  void add(String name, dynamic value, {String contentType, String filename}) {
     _entries.add(FormDataEntry.fromString(name, value.toString(),
         contentType: contentType, filename: filename, encoding: encoding));
   }
@@ -44,7 +43,7 @@ class FormData {
   ///
   /// [contents] will be added directly to the body, skipping encoding.
   void addFile(String name, List<int> contents,
-      {String? contentType, String? filename}) {
+      {String contentType, String filename}) {
     _entries.add(FormDataEntry.fromBytes(name, contents,
         filename: filename, contentType: contentType));
   }
