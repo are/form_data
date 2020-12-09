@@ -1,5 +1,5 @@
 name: form_data
-version: 0.1.0
+version: 0.0.1
 description: multipart/form-data builder for Dart aiming to be compatible with RFC 7578.
 homepage: https://github.com/are/form_data
 
