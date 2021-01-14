@@ -14,7 +14,7 @@ Add `form_data` to your `pubspec.yaml` and run `pub get` or `flutter pub get`.
 
 ```yaml
 dependencies:
-  form_data: ^1.0.0-0.nullsafety
+  form_data: ^1.0.0-nullsafety.1
 ```
 
 ## Usage
