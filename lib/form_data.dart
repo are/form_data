@@ -1,3 +1,3 @@
 library form_data;
 
-export 'src/form_data.dart';
+export 'src/form_data.dart' show FormData;

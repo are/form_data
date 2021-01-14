@@ -1,86 +1,95 @@
-import 'dart:math';
 import 'dart:convert';
 
-import 'package:form_data/src/form_data_entry.dart';
-
-String _generateBoundary() {
-  var random = Random();
-
-  var boundary = '--------------------------';
-
-  for (var i = 0; i < 24; i++) {
-    boundary += random.nextInt(10).toString();
-  }
-
-  return boundary;
-}
-
-const _LB = '\r\n';
+import 'entry.dart';
+import 'result.dart';
+import 'utils.dart';
 
 /// Used to generate form data.
 class FormData {
   /// Encoding used in converting [String] to [List<int>]. Defaults to `utf8`.
   final Encoding encoding;
-  final List<FormDataEntry> _entries = [];
 
   /// Boundary used in the form data.
-  String boundary = _generateBoundary();
+  String boundary = generateBoundary();
 
-  String get _midBoundary => '--${boundary}${_LB}';
-  String get _endBoundary => '--${boundary}--${_LB}';
+  final List<Entry> _entries = [];
 
   FormData({this.encoding = utf8});
 
   /// Add a field [name] to the form data.
   ///
   /// [value] will be converted to a string using [Object.toString] and encoded using [FormData.encoding].
-  void add(String name, dynamic value, {String contentType, String filename}) {
-    _entries.add(FormDataEntry.fromString(name, value.toString(),
-        contentType: contentType, filename: filename, encoding: encoding));
+  void add(String name, dynamic value) {
+    _isDirty = true;
+    _entries.add(
+      Entry.value(encoding.encode(name), encoding.encode(value.toString())),
+    );
   }
 
   /// Add a field [name] to the form data.
   ///
   /// [contents] will be added directly to the body, skipping encoding.
-  void addFile(String name, List<int> contents,
-      {String contentType, String filename}) {
-    _entries.add(FormDataEntry.fromBytes(name, contents,
-        filename: filename, contentType: contentType));
+  void addBytes(String name, List<int> bytes,
+      {String? contentType, String? filename}) {
+    _isDirty = true;
+    _entries.add(
+      Entry.file(encoding.encode(name), bytes,
+          contentType:
+              contentType == null ? null : encoding.encode(contentType),
+          filename: filename == null ? null : encoding.encode(filename)),
+    );
   }
 
-  /// Content type header including the boundary.
-  String get contentType => 'multipart/form-data; boundary=${boundary}';
+  /// Returns value of a first field named [name] or null if no fields were found.
+  String? get(String name) {
+    var bytes = getBytes(name);
+    return bytes != null ? encoding.decode(bytes) : null;
+  }
 
-  /// Length of the content.
-  int get contentLength => body.length;
+  /// Returns bytes of a first field named [name] or null if no fields were found.
+  List<int>? getBytes(String name) {
+    var matchedEntries =
+        _entries.where((entry) => encoding.decode(entry.name) == name);
 
-  /// Body of the form data.
-  List<int> get body {
-    var _body = <int>[];
-
-    for (var entry in _entries) {
-      _body.addAll(encoding.encode(_midBoundary));
-      _body.addAll(encoding
-          .encode('Content-Disposition: form-data; name="${entry.name}"'));
-
-      if (entry.filename != null) {
-        _body.addAll(encoding.encode('; filename="${entry.filename}"'));
-      }
-
-      _body.addAll(encoding.encode(_LB));
-
-      if (entry.contentType != null) {
-        _body.addAll(
-            encoding.encode('Content-Type: ${entry.contentType}${_LB}'));
-      }
-
-      _body.addAll(encoding.encode(_LB));
-      _body.addAll(entry.value);
-      _body.addAll(encoding.encode(_LB));
+    if (matchedEntries.isEmpty) {
+      return null;
     }
 
-    _body.addAll(encoding.encode(_endBoundary));
-
-    return _body;
+    return matchedEntries.first.value.bytes;
   }
+
+  /// Returns list of bytes of fields named [name].
+  List<List<int>> getAllBytes(String name) {
+    return _entries
+        .where((entry) => encoding.decode(entry.name) == name)
+        .map((entry) => entry.value.bytes)
+        .toList();
+  }
+
+  /// Returns list of values of fields named [name].
+  List<String> getAll(String name) {
+    return getAllBytes(name).map((bytes) => encoding.decode(bytes)).toList();
+  }
+
+  bool _isDirty = true;
+  FormDataResult? _lastResult;
+
+  FormDataResult get _result {
+    if (_isDirty || _lastResult == null) {
+      _lastResult = _build();
+    }
+
+    return _lastResult!;
+  }
+
+  FormDataResult _build() => FormDataResult(List.from(_entries), boundary);
+
+  /// Content-Type header value including the boundary.
+  String get contentType => _result.contentType;
+
+  /// Content-Length header value.
+  int get contentLength => _result.contentLength;
+
+  /// Actual body of the form-data.
+  List<int> get body => _result.body;
 }

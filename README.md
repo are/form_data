@@ -14,19 +14,19 @@ Add `form_data` to your `pubspec.yaml` and run `pub get` or `flutter pub get`.
 
 ```yaml
 dependencies:
-  form_data: ^0.0.1-nullsafety.1
+  form_data: ^1.0.0-0.nullsafety
 ```
 
 ## Usage
 
-Instantinate `FormData` class and add fields using `add` and `addFile` methods.
+Instantinate `FormData` class and add fields using `add` and `addBytes` methods.
 
 ```dart
 var formData = FormData();
 
 formData.add('name', 'Name Surname');
 formData.add('answer', 42);
-formData.addFile('file', await File('picture.png').readAsBytes(),
+formData.addBytes('file', await File('picture.png').readAsBytes(),
   filename: 'myPicture.png', contentType: 'image/png');
 ```
 

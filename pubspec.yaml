@@ -1,10 +1,10 @@
 name: form_data
-version: 0.0.1
+version: 1.0.0-nullsafety.0
 description: multipart/form-data builder for Dart aiming to be compatible with RFC 7578.
 homepage: https://github.com/are/form_data
 
 environment:
-  sdk: '>=2.6.0 <3.0.0'
+  sdk: '>=2.12.0-0 <3.0.0'
 
 dev_dependencies:
   pedantic: ^1.10.0-nullsafety.3

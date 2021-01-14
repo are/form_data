@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:form_data/form_data.dart';
@@ -16,11 +15,12 @@ void main() {
       formData.add('address', '''some longer
         value with new lines and emojis 😃''');
 
-      formData.addFile('image', await File('test/input.jpeg').readAsBytes(),
+      formData.addBytes('image', await File('test/input.jpeg').readAsBytes(),
           filename: 'myImage.jpeg', contentType: 'image/jpeg');
 
       var expected = await File('test/result.bin').readAsBytes();
 
+      expect(formData.contentLength, equals(expected.length));
       expect(formData.body, equals(expected));
     });
   });
